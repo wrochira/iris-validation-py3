@@ -41,7 +41,11 @@ class Panel():
             if not isinstance(metric_list, list):
                 raise ValueError('Chosen metrics in the _defs.py file must be lists')
             for metric_index in reversed(range(len(metric_list))):
-                if (metric_list[metric_index]['is_molprobity'] and not self.data[0]['has_molprobity']):
+                if (metric_list[metric_index]['is_covariance'] and not self.data[0]['has_covariance']):
+                    del metric_list[metric_index]
+                elif (metric_list[metric_index]['is_molprobity'] and not self.data[0]['has_molprobity']):
+                    del metric_list[metric_index]
+                elif (metric_list[metric_index]['is_reflections'] and not self.data[0]['has_reflections']):
                     del metric_list[metric_index]
 
     def _generate_javascript(self):
@@ -81,6 +85,8 @@ class Panel():
         middle_gap = 30
         view_border = 10
         view_title_font = 24
+        button_width = 38
+        button_height = 32
         view_width, view_height = [ dim - view_border for dim in self.canvas_size ]
         view_divider_x = round(2/3 * view_width, 2)
         chain_view_bounds = (view_border,
@@ -94,6 +100,9 @@ class Panel():
 
         # Initialise drawing
         self.dwg = svgwrite.Drawing(profile='full')
+
+        # Disable text selection
+        self.dwg.attribs['style'] = 'user-select: none;'
 
         # Draw background
         self.dwg.add(self.dwg.polygon(points=[ (0, 0),
@@ -134,11 +143,10 @@ class Panel():
                                    stroke_width=2))
 
         # Chain selector buttons
-        #self.chain_ids = [ chr(65+i) for i in range(20) ] # TODO: remove this
         for chain_index, chain_id in enumerate(self.chain_ids[:12]):
             selector_color = self.swtich_colors[1] if chain_index == 0 else self.swtich_colors[0]
             self.dwg.add(self.dwg.rect(insert=(chain_view_bounds[0] + 75 + 50*chain_index, chain_view_bounds[1]),
-                                       size=(38, 32),
+                                       size=(button_width, button_height),
                                        rx=5,
                                        stroke_opacity=0,
                                        fill_opacity=0.5,
@@ -146,12 +154,14 @@ class Panel():
                                        id=f'{self.svg_id}-chain-selector-{chain_index}'))
 
             self.dwg.add(self.dwg.text(text=chain_id,
-                                       insert=(chain_view_bounds[0] + 85 + 50*chain_index, chain_view_bounds[1]+view_title_font),
+                                       insert=(chain_view_bounds[0] + 75 + button_width/2 + 50*chain_index, chain_view_bounds[1] + button_height/2),
                                        font_size=view_title_font,
-                                       font_family='Arial'))
+                                       font_family='Arial',
+                                       text_anchor='middle',
+                                       alignment_baseline='central'))
 
             self.dwg.add(self.dwg.rect(insert=(chain_view_bounds[0] + 75 + 50*chain_index, chain_view_bounds[1]),
-                                       size=(38, 32),
+                                       size=(button_width, button_height),
                                        rx=5,
                                        stroke_opacity=0,
                                        fill_opacity=0,

@@ -45,7 +45,8 @@ class PercentileCalculator():
                 self.resolution_bins[percentile] = threshold
 
         if self.resolution is None:
-            return 'All'
+            self.bin_name = 'All'
+            return
         bin_id = 9
         for i, percentile in enumerate(sorted(self.resolution_bins.keys())):
             percentile_resolution = self.resolution_bins[percentile]

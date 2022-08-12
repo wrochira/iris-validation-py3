@@ -2,10 +2,12 @@ from iris_validation.metrics.residue import MetricsResidue
 
 
 class MetricsChain():
-    def __init__(self, mmol_chain, parent_model=None, molprobity_data=None):
+    def __init__(self, mmol_chain, parent_model=None, covariance_data=None, molprobity_data=None, density_scores=None):
         self.minimol_chain = mmol_chain
         self.parent_model = parent_model
+        self.covariance_data = covariance_data
         self.molprobity_data = molprobity_data
+        self.density_scores = density_scores
 
         self._index = -1
         self.residues = [ ]
@@ -15,9 +17,11 @@ class MetricsChain():
         for residue_index, mmol_residue in enumerate(mmol_chain):
             previous_residue = mmol_chain[residue_index-1] if residue_index > 0 else None
             next_residue = mmol_chain[residue_index+1] if residue_index < len(mmol_chain)-1 else None
-            seq_no = int(mmol_residue.seqnum())
-            residue_molprobity_data = None if molprobity_data is None else molprobity_data[seq_no]
-            residue = MetricsResidue(mmol_residue, residue_index, previous_residue, next_residue, self, residue_molprobity_data)
+            seq_num = int(mmol_residue.seqnum())
+            residue_covariance_data = None if covariance_data is None else covariance_data[seq_num]
+            residue_molprobity_data = None if molprobity_data is None else molprobity_data[seq_num]
+            residue_density_scores = None if density_scores is None else density_scores[seq_num]
+            residue = MetricsResidue(mmol_residue, residue_index, previous_residue, next_residue, self, residue_covariance_data, residue_molprobity_data, residue_density_scores)
             self.residues.append(residue)
 
         for residue_index, residue in enumerate(self.residues):
@@ -65,7 +69,7 @@ class MetricsChain():
                 non_aa_bfs.append(residue.avg_b_factor)
                 if residue.is_water:
                     water_bfs.append(residue.avg_b_factor)
-                # Silly assumption, followed to be consistent with original i2 validation tool:
+                # Followed to be consistent with the original CCP4 i2 validation tool:
                 elif len(residue.atoms) > 1:
                     ligand_bfs.append(residue.avg_b_factor)
                 else:

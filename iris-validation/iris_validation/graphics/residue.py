@@ -66,7 +66,7 @@ class ResidueView():
                                           stroke_opacity=1,
                                           id=f'{self.svg_id}-box-{box_id}'))
             self.dwg.add(self.dwg.text('',
-                                       insert=((box_bounds[0]+box_bounds[2])/2, (box_bounds[1]+box_bounds[3]+10)/2),
+                                       insert=((box_bounds[0]+box_bounds[2])/2, (box_bounds[1]+box_bounds[3])/2),
                                        font_size=20,
                                        font_family='Arial',
                                        font_weight='bold',
@@ -76,7 +76,7 @@ class ResidueView():
                                        alignment_baseline='central',
                                        id=f'{self.svg_id}-box-{box_id}-text'))
             self.dwg.add(self.dwg.text(box_title,
-                                       insert=(left_indent + 0.125*self.canvas_size[0], (box_bounds[1]+box_bounds[3])/2+5),
+                                       insert=(left_indent + 0.125*self.canvas_size[0], (box_bounds[1]+box_bounds[3])/2),
                                        font_size=18,
                                        font_family='Arial',
                                        fill=COLORS['BLACK'],

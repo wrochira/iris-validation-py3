@@ -70,7 +70,9 @@ class MetricsModelSeries():
             self.align_models()
 
         num_versions = len(self.metrics_models)
+        has_covariance = self.metrics_models[0].covariance_data is not None
         has_molprobity = self.metrics_models[0].molprobity_data is not None
+        has_reflections = self.metrics_models[0].reflections_data is not None
 
         raw_data = [ ]
         for chain_id, chain_set in self.chain_sets.items():
@@ -78,7 +80,9 @@ class MetricsModelSeries():
             aligned_length = len(alignment_strings[0])
             chain_data = { 'chain_id'           : chain_id,
                            'num_versions'       : num_versions,
+                           'has_covariance'     : has_covariance,
                            'has_molprobity'     : has_molprobity,
+                           'has_reflections'    : has_reflections,
                            'aligned_length'     : aligned_length,
                            'residue_seqnos'     : [ ],
                            'residue_codes'      : [ ],
@@ -101,9 +105,9 @@ class MetricsModelSeries():
                         residue_seqnos.append(None)
                         residue_codes.append(None)
                         residue_validities.append(False)
-                        discrete_values.append(tuple(None for _ in range(3)))
-                        continuous_values.append(tuple(None for _ in range(6)))
-                        percentile_values.append(tuple(None for _ in range(6)))
+                        discrete_values.append(tuple(None for _ in range(4)))
+                        continuous_values.append(tuple(None for _ in range(7)))
+                        percentile_values.append(tuple(None for _ in range(7)))
                         continue
 
                     residue_id += 1
@@ -114,19 +118,22 @@ class MetricsModelSeries():
 
                     residue_discrete_values = (residue.discrete_indicators['rotamer'],
                                                residue.discrete_indicators['ramachandran'],
-                                               residue.discrete_indicators['clash'])
+                                               residue.discrete_indicators['clash'],
+                                               residue.discrete_indicators['cmo'])
                     residue_continuous_values = (residue.avg_b_factor,
                                                  residue.max_b_factor,
                                                  residue.std_b_factor,
                                                  residue.fit_score,
                                                  residue.mainchain_fit_score,
-                                                 residue.sidechain_fit_score)
+                                                 residue.sidechain_fit_score,
+                                                 residue.covariance_score)
                     residue_percentile_values = (residue.avg_b_factor_percentile,
                                                  residue.max_b_factor_percentile,
                                                  residue.std_b_factor_percentile,
                                                  residue.fit_score_percentile,
                                                  residue.mainchain_fit_score_percentile,
-                                                 residue.sidechain_fit_score_percentile)
+                                                 residue.sidechain_fit_score_percentile,
+                                                 residue.covariance_score_percentile)
 
                     residue_continuous_values = tuple(round(x, 3) if isinstance(x, float) else x for x in residue_continuous_values)
                     discrete_values.append(residue_discrete_values)

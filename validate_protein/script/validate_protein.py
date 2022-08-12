@@ -119,9 +119,13 @@ class validate_protein(CPluginScript):
     def calculate_iris_metrics(self):
         log_string = ''
         xml_root = etree.Element('Model_info')
-        self.model_series = metrics_model_series_from_files((self.previous_model_path, self.latest_model_path),
-                                                            (self.previous_reflections_path, self.latest_reflections_path),
-                                                            self.container.controlParameters.DO_MOLPROBITY)
+        self.model_series = metrics_model_series_from_files(model_paths=(self.previous_model_path, self.latest_model_path),
+                                                            reflections_paths=(self.previous_reflections_path, self.latest_reflections_path),
+                                                            sequence_paths=None,
+                                                            distpred_paths=None,
+                                                            run_covariance=False,
+                                                            run_molprobity=self.container.controlParameters.DO_MOLPROBITY,
+                                                            multiprocessing=None)
         self.latest_model = self.model_series.metrics_models[-1]
         etree.SubElement(xml_root, 'Chain_count').text = str(self.latest_model.chain_count)
         return log_string, xml_root
@@ -132,7 +136,7 @@ class validate_protein(CPluginScript):
         xml_root = etree.Element('Iris')
         model_series_data = self.model_series.get_raw_data()
         panel = Panel(model_series_data)
-        panel.dwg.attribs['style'] = 'margin-top:-20px;'
+        panel.dwg.attribs['style'] += ' margin-top: -20px;'
         panel_string = panel.dwg.tostring()
         etree.SubElement(xml_root, 'Panel_svg').text = panel_string
         return log_string, xml_root
@@ -168,8 +172,6 @@ class validate_protein(CPluginScript):
                 item = etree.SubElement(category_root, 'Outlier', chain=chain, seqnum=seqnum, name=name, score=score)
 
         clash_root = etree.SubElement(xml_root, 'Clashes')
-        from pprint import pprint
-        pprint(molprobity_data['details']['clash'])
         for row in molprobity_data['details']['clash']:
             item = etree.SubElement(clash_root, 'Outlier', first_atom=row[0], second_atom=row[1], overlap=str(row[2]))
 

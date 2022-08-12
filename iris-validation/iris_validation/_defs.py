@@ -24,27 +24,33 @@ COLORS = { 'BLACK'      : 'rgb(000, 000, 000)',
 
 CONTINUOUS_METRICS = ( { 'id'            : 0,
                          'type'          : 'continuous',
-                         'long_name'     : 'Avg. B-factor',
+                         'long_name'     : 'Average B-factor',
                          'short_name'    : 'Avg. B',
                          'ring_color'    : COLORS['CYAN'],
                          'polarity'      : -1,
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': False
                        },
                        { 'id'            : 1,
                          'type'          : 'continuous',
-                         'long_name'     : 'Max. B-factor',
+                         'long_name'     : 'Maximum B-factor',
                          'short_name'    : 'Max. B',
                          'ring_color'    : COLORS['TEAL'],
                          'polarity'      : -1,
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': False
                        },
                        { 'id'            : 2,
                          'type'          : 'continuous',
-                         'long_name'     : 'Std. B-factor',
+                         'long_name'     : 'Stdev B-factor',
                          'short_name'    : 'Std. B',
                          'ring_color'    : COLORS['SLATE'],
                          'polarity'      : -1,
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': False
                        },
                        { 'id'            : 3,
                          'type'          : 'continuous',
@@ -52,23 +58,39 @@ CONTINUOUS_METRICS = ( { 'id'            : 0,
                          'short_name'    : 'Res. Fit',
                          'ring_color'    : COLORS['MAGENTA'],
                          'polarity'      : -1,
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': True
                        },
                        { 'id'            : 4,
                          'type'          : 'continuous',
                          'long_name'     : 'Main Chain Fit',
-                         'short_name'    : 'M.C. Fit',
+                         'short_name'    : 'Main Fit',
                          'ring_color'    : COLORS['BLUE'],
                          'polarity'      : -1,
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': True
                        },
                        { 'id'            : 5,
                          'type'          : 'continuous',
                          'long_name'     : 'Side Chain Fit',
-                         'short_name'    : 'S.C. Fit',
+                         'short_name'    : 'Side Fit',
                          'ring_color'    : COLORS['INDIGO'],
                          'polarity'      : -1,
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': True
+                       },
+                       { 'id'            : 6,
+                         'type'          : 'continuous',
+                         'long_name'     : 'Covariance Score',
+                         'short_name'    : 'Cov. Score',
+                         'ring_color'    : COLORS['ORANGE'],
+                         'polarity'      : -1,
+                         'is_covariance' : True,
+                         'is_molprobity' : False,
+                         'is_reflections': False
                        }
                      )
 
@@ -83,7 +105,9 @@ DISCRETE_METRICS =   ( { 'id'            : 0,
                          'seq_labels'    : ('Outlier',
                                             'Allowed',
                                             'Favoured'),
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': False
                        },
                        { 'id'            : 1,
                          'type'          : 'discrete',
@@ -96,7 +120,9 @@ DISCRETE_METRICS =   ( { 'id'            : 0,
                          'seq_labels'    : ('Outlier',
                                             'Allowed',
                                             'Favoured'),
-                         'is_molprobity' : False
+                         'is_covariance' : False,
+                         'is_molprobity' : False,
+                         'is_reflections': False
                        },
                        { 'id'            : 2,
                          'type'          : 'discrete',
@@ -109,8 +135,23 @@ DISCRETE_METRICS =   ( { 'id'            : 0,
                          'seq_labels'    : ('Multiple Clashes',
                                             'One Clash',
                                             'No Clashes'),
-                         'is_molprobity' : True
-                        }
+                         'is_covariance' : False,
+                         'is_molprobity' : True,
+                         'is_reflections': False
+                       },
+                       { 'id'            : 3,
+                         'type'          : 'discrete',
+                         'long_name'     : 'Misalignment',
+                         'short_name'    : 'CMO',
+                         'ring_color'    : COLORS['L_GREY'],
+                         'seq_colors'    : (COLORS['RED'],
+                                            COLORS['GREEN']),
+                         'seq_labels'    : ('Misaligned',
+                                            'Aligned'),
+                         'is_covariance' : True,
+                         'is_molprobity' : False,
+                         'is_reflections': False
+                       }
                      )
 
 CHAIN_VIEW_GAP_ANGLE = 0.35
@@ -119,14 +160,17 @@ RAMACHANDRAN_THRESHOLDS = (0.02, 0.002)
 CHAIN_VIEW_RINGS   = [ DISCRETE_METRICS[0],
                        DISCRETE_METRICS[1],
                        DISCRETE_METRICS[2],
+                       DISCRETE_METRICS[3],
                        CONTINUOUS_METRICS[0],
                        CONTINUOUS_METRICS[1],
                        CONTINUOUS_METRICS[4],
-                       CONTINUOUS_METRICS[5] ]
+                       CONTINUOUS_METRICS[5],
+                       CONTINUOUS_METRICS[6] ]
 
 RESIDUE_VIEW_BOXES = [ DISCRETE_METRICS[0],
                        DISCRETE_METRICS[1],
-                       DISCRETE_METRICS[2] ]
+                       DISCRETE_METRICS[2],
+                       DISCRETE_METRICS[3] ]
 
 RESIDUE_VIEW_BARS  = [ CONTINUOUS_METRICS[0],
                        CONTINUOUS_METRICS[5] ]

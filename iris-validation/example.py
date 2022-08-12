@@ -15,10 +15,16 @@ if __name__ == '__main__':
     t0 = time.time()
 
     generate_report(latest_model_path=ROOT_PATH.format(suffix='_final.pdb'),
-                    previous_model_path=ROOT_PATH.format(suffix='_0cyc.pdb'),
                     latest_reflections_path=ROOT_PATH.format(suffix='_final.mtz'),
+                    latest_sequence_path=ROOT_PATH.format(suffix='.fasta'),
+                    latest_distpred_path=ROOT_PATH.format(suffix='.npz'),
+                    previous_model_path=ROOT_PATH.format(suffix='_0cyc.pdb'),
                     previous_reflections_path=ROOT_PATH.format(suffix='_0cyc.mtz'),
+                    previous_sequence_path=ROOT_PATH.format(suffix='.fasta'),
+                    previous_distpred_path=ROOT_PATH.format(suffix='.npz'),
+                    run_covariance=False,
                     run_molprobity=False,
+                    multiprocessing=True,
                     output_dir=OUTPUT_DIR)
 
     t1 = time.time()

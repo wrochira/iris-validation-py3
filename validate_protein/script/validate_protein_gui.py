@@ -11,9 +11,9 @@ class validate_protein_gui(CTaskWidget):
     TASKNAME = 'validate_protein'
     TASKVERSION = 0.1
     TASKMODULE='validation'
-    TASKTITLE='Iris multimetric model validation'
+    TASKTITLE='Multimetric model validation - Iris'
     SHORTTASKTITLE='Multimetric validation'
-    DESCRIPTION = 'Calculates per-residue metrics, including B-factors, density fit quality, Ramachandran plots, rotamer outliers, clashes... (Iris-Validation & MolProbity)'
+    DESCRIPTION = 'Calculates per-residue metrics including B-factors, density fit quality, Ramachandran plots, rotamer outliers, and clashes (Iris-Validation & MolProbity)'
     RANK = 1 # This means the task's entry will carry a gears badge, signifying that it is a pipeline
 
     def __init__(self,parent):

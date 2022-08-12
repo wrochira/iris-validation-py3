@@ -4,24 +4,29 @@ from iris_validation.metrics.percentiles import PercentileCalculator
 
 
 class MetricsModel():
-    def __init__(self, mmol_model, reflections_handler=None, molprobity_data=None):
+    def __init__(self, mmol_model, covariance_data=None, molprobity_data=None, reflections_data=None):
         self.minimol_model = mmol_model
-        self.reflections_handler = reflections_handler
+        self.covariance_data = covariance_data
         self.molprobity_data = molprobity_data
+        self.reflections_data = reflections_data
 
         self._index = -1
         self.minimol_chains = list(mmol_model.model())
         self.chain_count = len(self.minimol_chains)
 
-        self.resolution = reflections_handler.resolution_limit if reflections_handler is not None else None
+        self.resolution, self.density_scores = None, None
+        if reflections_data is not None:
+            self.resolution, self.density_scores = reflections_data
         self.percentile_calculator = PercentileCalculator(self.resolution)
         self.rotamer_calculator = RotamerCalculator()
 
         self.chains = [ ]
         for mmol_chain in mmol_model:
             chain_id = str(mmol_chain.id().trim())
+            chain_covariance_data = None if covariance_data is None else covariance_data[chain_id]
             chain_molprobity_data = None if molprobity_data is None else molprobity_data[chain_id]
-            chain = MetricsChain(mmol_chain, self, chain_molprobity_data)
+            chain_density_scores = None if self.density_scores is None else self.density_scores[chain_id]
+            chain = MetricsChain(mmol_chain, self, chain_covariance_data, chain_molprobity_data, chain_density_scores)
             chain.remove_non_aa_residues()
             self.chains.append(chain)
 

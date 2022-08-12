@@ -18,7 +18,6 @@ class ReflectionsHandler():
         self.spacegroup = None
         self.cell = None
         self.resolution = None
-        self.resolution_limit = None
 
         if f_reflections is None:
             if xmap is None:
@@ -49,7 +48,7 @@ class ReflectionsHandler():
         mtz_labels_and_types = [ tuple(str(line).strip().split(' ')) for line in mtzin.column_labels() ]
         mtz_column_labels, _ = zip(*mtz_labels_and_types)
         mtz_column_label_suffixes = set([ label.split('/')[-1] for label in mtz_column_labels ])
-        # Need a better way to choose the right headers, but I'm not familiar enough with reflections data to know what labels are common
+        # TODO: need a better way to choose the right headers
         import_complete = False
         for suffix_pair in ( ('F', 'SIGF'),
                              ('FP', 'SIGFP'),
@@ -61,8 +60,7 @@ class ReflectionsHandler():
                     import_complete = True
                     break
                 except Exception as exception:
-                    print('Failed to import HKL data from reflections file')
-                    raise exception
+                    raise Exception('Failed to import HKL data from reflections file') from exception
         if not import_complete:
             raise ValueError('Reflections file does not contain the required columns')
         mtzin.close_read()
@@ -74,7 +72,7 @@ class ReflectionsHandler():
         self.spacegroup = spacegroup
         self.cell = cell
         self.resolution = resolution
-        self.resolution_limit = self.resolution.limit()
+        self.resolution_limit = resolution.limit()
 
     def _calculate_structure_factors(self, bulk_solvent=True):
         #self.crystal = clipper.MTZcrystal()
@@ -110,27 +108,33 @@ class ReflectionsHandler():
         xyz = (co.x(), co.y(), co.z())
         return self.get_density_at_point(xyz)
 
-    def get_density_scores_at_residue(self, metrics_residue):
-        all_atom_scores, mainchain_atom_scores, sidechain_atom_scores = [ ], [ ], [ ]
-        for atom_id, atom in enumerate(metrics_residue.minimol_residue):
-            is_mainchain = str(atom.name()).strip() in utils.MC_ATOM_NAMES
-            element = str(atom.element()).strip()
-            atomic_number = utils.ATOMIC_NUMBERS[element]
-            density = self.get_density_at_atom(atom)
-            atom_score = None
-            density_norm = density / atomic_number
-            atom_score = -log(norm.cdf((density_norm - self.map_mean) / self.map_std))
-            all_atom_scores.append(atom_score)
-            if is_mainchain:
-                mainchain_atom_scores.append(atom_score)
-            else:
-                sidechain_atom_scores.append(atom_score)
-        all_score, mainchain_score, sidechain_score = None, None, None
-        if len(all_atom_scores) > 0:
-            all_score = sum(all_atom_scores) / len(all_atom_scores)
-        if metrics_residue.is_aa:
-            if len(mainchain_atom_scores) > 0:
-                mainchain_score = sum(mainchain_atom_scores) / len(mainchain_atom_scores)
-            if len(sidechain_atom_scores) > 0:
-                sidechain_score = sum(sidechain_atom_scores) / len(sidechain_atom_scores)
-        return all_score, mainchain_score, sidechain_score
+    def calculate_all_density_scores(self):
+        density_scores = { }
+        for chain in self.minimol:
+            chain_id = str(chain.id()).strip()
+            density_scores[chain_id] = { }
+            for residue in chain:
+                seq_num = int(residue.seqnum())
+                all_atom_scores, mainchain_atom_scores, sidechain_atom_scores = [ ], [ ], [ ]
+                for atom_id, atom in enumerate(residue):
+                    is_mainchain = str(atom.name()).strip() in utils.MC_ATOM_NAMES
+                    element = str(atom.element()).strip()
+                    atomic_number = utils.ATOMIC_NUMBERS[element]
+                    density = self.get_density_at_atom(atom)
+                    atom_score = None
+                    density_norm = density / atomic_number
+                    atom_score = -log(norm.cdf((density_norm - self.map_mean) / self.map_std))
+                    all_atom_scores.append(atom_score)
+                    if is_mainchain:
+                        mainchain_atom_scores.append(atom_score)
+                    else:
+                        sidechain_atom_scores.append(atom_score)
+                all_score, mainchain_score, sidechain_score = None, None, None
+                if len(all_atom_scores) > 0:
+                    all_score = sum(all_atom_scores) / len(all_atom_scores)
+                if len(mainchain_atom_scores) > 0:
+                    mainchain_score = sum(mainchain_atom_scores) / len(mainchain_atom_scores)
+                if len(sidechain_atom_scores) > 0:
+                    sidechain_score = sum(sidechain_atom_scores) / len(sidechain_atom_scores)
+                density_scores[chain_id][seq_num] = (all_score, mainchain_score, sidechain_score)
+        return density_scores

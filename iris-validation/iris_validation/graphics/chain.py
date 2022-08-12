@@ -145,7 +145,7 @@ class ChainView():
                                    text_anchor='middle',
                                    alignment_baseline='central'))
         if self.data['has_molprobity']:
-            self.dwg.add(self.dwg.text(text='MolProbity Enabled',
+            self.dwg.add(self.dwg.text(text='MolProbity',
                                        insert=(self.center[0], self.center[1]+48),
                                        font_size=16,
                                        font_family='Arial',
@@ -216,8 +216,9 @@ class ChainView():
                     value = datapoint * metric['polarity']
                     all_valid_values.append(value)
             ring_avg = 0
-            if len(all_valid_values) > 0:
-                ring_avg = sum(all_valid_values) / len(all_valid_values)
+            if len(all_valid_values) == 0:
+                return
+            ring_avg = sum(all_valid_values) / len(all_valid_values)
 
             # Calculate deltas from the ring average
             deltas = [ ]
