@@ -167,11 +167,6 @@ def _get_covariance_data(model_path,
             alignment = 0 if seq_num in figure.alignment.keys() else 1
             covariance_data[chain_id][seq_num] = (score, alignment)
 
-    from pprint import pprint
-    print()
-    pprint(covariance_data)
-    print()
-
     if out_queue is not None:
         out_queue.put(('covariance', model_id, covariance_data))
 
