@@ -1,6 +1,7 @@
 from multiprocessing import Process, Queue
 
 import clipper
+import gemmi
 
 from iris_validation.utils import ONE_LETTER_CODES
 from iris_validation.metrics.residue import MetricsResidue
